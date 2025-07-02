@@ -448,7 +448,7 @@ func! s:MRU_Window_Edit_File(fname, multi, edit_type, open_type) abort
       if g:MRU_Auto_Close == 1 && g:MRU_Use_Current_Window == 0
 	" Jump to the window from which the MRU window was opened
 	if exists('s:MRU_last_buffer')
-	  let last_winnr = bufwinnr(s:MRU_last_win)
+	  let last_winnr = bufwinnr(s:MRU_last_buffer)
 	  if last_winnr != s:MRU_last_win &&
 	      \ winbufnr(s:MRU_last_win) == bufnr(s:MRU_last_buffer)
 	    " in case the last window's buffer is in multiple windows
