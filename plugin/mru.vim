@@ -448,7 +448,12 @@ func! s:MRU_Window_Edit_File(fname, multi, edit_type, open_type) abort
       if g:MRU_Auto_Close == 1 && g:MRU_Use_Current_Window == 0
 	" Jump to the window from which the MRU window was opened
 	if exists('s:MRU_last_buffer')
-	  let last_winnr = bufwinnr(s:MRU_last_buffer)
+	  let last_winnr = bufwinnr(s:MRU_last_win)
+	  if last_winnr != s:MRU_last_win &&
+	      \ winbufnr(s:MRU_last_win) == bufnr(s:MRU_last_buffer)
+	    " in case the last window's buffer is in multiple windows
+	    let last_winnr = s:MRU_last_win
+	  endif
 	  if last_winnr != -1 && last_winnr != winnr()
 	    exe last_winnr . 'wincmd w'
 	  endif
@@ -603,10 +608,11 @@ func! s:MRU_Open_Window(pat, splitdir, winsz) abort
     return
   endif
 
-  " Save the current buffer number. This is used later to open a file when a
-  " entry is selected from the MRU window. The window number is not saved,
-  " as the window number will change when new windows are opened.
+  " Save the current buffer and window number. This is used later to open a
+  " file when a entry is selected from the MRU window. The window number is
+  " saved in case the same buffer is open in multiple windows.
   let s:MRU_last_buffer = bufnr('%')
+  let s:MRU_last_win = winnr()
 
   let bname = s:MRU_buf_name
 
