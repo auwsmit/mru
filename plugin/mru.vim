@@ -148,6 +148,15 @@ if !exists('MRU_Filename_Format')
 	\}
 endif
 
+" This option is only for Windows OS.
+" Convert forward slashes to backslashes in the MRU list. This prevents
+" duplicate files in the list due to varying slashes used to open files.
+" For example, C:\foo\bar and C:\foo/bar would be seen as two different files
+" without this option.
+if !exists('MRU_Convert_Slashes')
+  let MRU_Convert_Slashes = 1
+endif
+
 let s:MRU_buf_name = '-RecentFiles-'
 
 " Control to temporarily lock the MRU list. Used to prevent files from
@@ -205,6 +214,11 @@ func! s:MRU_AddFile(acmd_bufnr) abort
   let fname = fnamemodify(bufname(a:acmd_bufnr + 0), ':p')
   if empty(fname)
     return
+  endif
+
+  " Convert / to \ on Windows in case of duplicate file names
+  if has('win32') && g:MRU_Convert_Slashes
+    let fname = substitute(fname, '/', '\', 'g')
   endif
 
   " Skip temporary buffers with buftype set. The buftype is set for buffers
@@ -954,6 +968,7 @@ func! s:MRU_add_files_to_menu(prefix, file_list) abort
 	      \ strpart(dir_name, len - 20)
       endif
     endif
+
     let esc_dir_name = escape(dir_name, ".\\" . s:esc_filename_chars)
     let esc_dir_name = substitute(esc_dir_name, '&', '&&', 'g')
 
