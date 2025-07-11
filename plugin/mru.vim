@@ -908,7 +908,7 @@ func! s:MRU_Toggle(pat, splitdir) abort
         if g:MRU_Use_Current_Window && !empty(expand('#'))
           silent! b #
         else
-          wincmd p
+          if winnum == winnr() | wincmd p | endif
           silent! exec winnum . 'wincmd c'
         endif
     else
